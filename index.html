@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="mr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Daily Hishob</title>
+<style>
+:root{--bg:#f3f6fb;--card:#fff;--ink:#172033;--muted:#667085;--blue:#2457d6;--green:#12805c;--red:#c0392b;--line:#e4e9f2}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,"Noto Sans Devanagari",sans-serif;background:var(--bg);color:var(--ink)}
+header{background:linear-gradient(135deg,#173b9b,#3478ed);color:#fff;padding:22px 16px 18px;border-radius:0 0 22px 22px}
+header h1{font-size:24px;margin:0 0 6px}header p{margin:0;font-size:13px;opacity:.9}
+.wrap{max-width:900px;margin:auto;padding:14px}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:0 0 14px}
+.card,.panel{background:var(--card);border-radius:15px;padding:14px;box-shadow:0 3px 14px #18294a0b}
+.metric small{display:block;color:var(--muted);font-size:12px;margin-bottom:8px}.metric strong{font-size:clamp(15px,4vw,23px);overflow-wrap:anywhere}
+.green{color:var(--green)}.red{color:var(--red)}.blue{color:var(--blue)}
+.tabs{display:flex;gap:8px;overflow:auto;margin:14px 0}.tab{border:0;border-radius:11px;padding:11px 14px;background:#e5ebf7;color:#24314b;font-weight:700;white-space:nowrap}.tab.active{background:var(--blue);color:#fff}
+.panel{margin-bottom:13px}.panel h2{font-size:18px;margin:0 0 13px}
+label{display:block;font-size:13px;color:#4d586c;margin:10px 0 5px}
+input,select,textarea{width:100%;padding:11px;border:1px solid #d8deea;border-radius:10px;background:#fff;font:inherit;color:var(--ink)}
+textarea{resize:vertical;min-height:42px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{cursor:pointer;font:inherit}.primary{border:0;background:var(--blue);color:#fff;padding:12px 15px;border-radius:10px;font-weight:700;margin-top:12px}.secondary{border:1px solid #d5ddec;background:#fff;padding:9px 12px;border-radius:9px;color:#24314b}.danger{color:var(--red)}
+.category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cat{padding:12px 6px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:center;color:var(--ink)}
+.cat .icon{font-size:24px;display:block;margin-bottom:5px}.cat.selected{border:2px solid var(--blue);background:#eef3ff}
+.hidden{display:none!important}.muted{color:var(--muted);font-size:13px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}.entry{padding:12px 0;border-bottom:1px solid var(--line)}.entry:last-child{border-bottom:0}
+.entry-title{font-weight:700}.entry-sub{font-size:12px;color:var(--muted);margin-top:4px}.entry-amount{font-weight:700;white-space:nowrap}.actions{display:flex;gap:6px;margin-top:7px}.actions button{font-size:12px;padding:6px 9px}
+.notice{background:#fff8df;border:1px solid #f2df9b;padding:11px;border-radius:10px;font-size:13px;line-height:1.5;margin-bottom:12px}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:12px}
+@media(max-width:480px){.cards{gap:6px}.metric{padding:10px}.metric small{font-size:11px}.grid{grid-template-columns:1fr}.category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.panel{padding:12px}}
+</style>
+</head>
+<body>
+<header><h1>My Daily Hishob</h1><p>दररोजचे उत्पन्न, खर्च आणि शिल्लक — सोप्या पद्धतीने</p></header>
+<div class="wrap">
+<div class="notice">तुमचा हिशोब या डिव्हाइसच्या ब्राउझरमध्ये सेव्ह होतो. फोन/कॉम्प्युटर बदलण्यापूर्वी <b>Backup</b> घ्या. मोबाईल आणि कॉम्प्युटरमध्ये डेटा आपोआप सिंक होत नाही.</div>
+<section class="cards">
+ <div class="card metric"><small>एकूण उत्पन्न</small><strong class="green" id="totalIncome">₹0</strong></div>
+ <div class="card metric"><small>एकूण खर्च</small><strong class="red" id="totalExpense">₹0</strong></div>
+ <div class="card metric"><small>शिल्लक</small><strong class="blue" id="balance">₹0</strong></div>
+</section>
+<div class="tabs">
+<button class="tab active" data-tab="dashboard">मुख्य पान</button><button class="tab" data-tab="income">उत्पन्न जोडा</button><button class="tab" data-tab="expense">खर्च जोडा</button><button class="tab" data-tab="reports">रिपोर्ट</button><button class="tab" data-tab="backup">Backup</button>
+</div>
+<section id="dashboard" class="view">
+ <div class="panel"><h2>आजचा हिशोब</h2><div class="grid">
+ <div><div class="muted">आजचे उत्पन्न</div><h3 id="todayIncome" class="green">₹0</h3></div>
+ <div><div class="muted">आजचा खर्च</div><h3 id="todayExpense" class="red">₹0</h3></div>
+ </div></div>
+ <div class="panel"><h2>अलीकडील नोंदी</h2><div id="recentList" class="muted">अजून नोंदी नाहीत.</div></div>
+</section>
+<section id="income" class="view hidden">
+ <div class="panel"><h2>उत्पन्न नोंदवा</h2>
+ <form id="incomeForm"><input type="hidden" id="incomeEditId">
+ <div class="grid"><div><label>उत्पन्नाचा प्रकार</label><select id="incomeCategory"><option>पगार</option><option>व्यवसाय</option><option>इतर उत्पन्न</option></select></div>
+ <div><label>रक्कम (₹)</label><input id="incomeAmount" type="number" min="0.01" step="0.01" required placeholder="उदा. 35000"></div></div>
+ <div class="grid"><div><label>तारीख</label><input id="incomeDate" type="date" required></div><div><label>नवीन प्रकार जोडायचा असल्यास</label><input id="newIncomeCategory" placeholder="उदा. बोनस"></div></div>
+ <label>नोंद (ऐच्छिक)</label><input id="incomeNote" placeholder="उदा. नोव्हेंबरचा पगार">
+ <button class="primary" type="submit">उत्पन्न सेव्ह करा</button> <button class="secondary hidden" type="button" id="cancelIncomeEdit">रद्द करा</button>
+ </form></div>
+ <div class="panel"><h2>उत्पन्नाच्या नोंदी</h2><div id="incomeList"></div></div>
+</section>
+<section id="expense" class="view hidden">
+ <div class="panel"><h2>खर्च नोंदवा</h2>
+ <label>खर्चाचा प्रकार निवडा</label><div class="category-grid" id="categoryGrid"></div>
+ <form id="expenseForm"><input type="hidden" id="expenseEditId">
+ <div class="grid"><div><label>रक्कम (₹)</label><input id="expenseAmount" type="number" min="0.01" step="0.01" required placeholder="उदा. 250"></div><div><label>तारीख</label><input id="expenseDate" type="date" required></div></div>
+ <label>नवीन खर्चाचा प्रकार (ऐच्छिक)</label><div class="grid"><input id="newExpenseCategory" placeholder="उदा. औषधे"><input id="newExpenseIcon" maxlength="2" placeholder="चिन्ह उदा. ✚"></div>
+ <label>नोंद (ऐच्छिक)</label><input id="expenseNote" placeholder="कशासाठी खर्च झाला?">
+ <button class="primary" type="submit">खर्च सेव्ह करा</button> <button class="secondary hidden" type="button" id="cancelExpenseEdit">रद्द करा</button>
+ </form></div>
+ <div class="panel"><h2>खर्चाच्या नोंदी</h2><div id="expenseList"></div></div>
+</section>
+<section id="reports" class="view hidden">
+ <div class="panel"><h2>हिशोबाचा रिपोर्ट</h2><div class="grid"><div><label>महिना</label><input id="reportMonth" type="month"></div><div><label>प्रकार</label><select id="reportType"><option value="all">सर्व नोंदी</option><option value="income">फक्त उत्पन्न</option><option value="expense">फक्त खर्च</option></select></div></div>
+ <div class="grid" style="margin-top:12px"><div class="card"><small class="muted">उत्पन्न</small><h3 id="reportIncome" class="green">₹0</h3></div><div class="card"><small class="muted">खर्च</small><h3 id="reportExpense" class="red">₹0</h3></div></div><div id="reportList"></div></div>
+</section>
+<section id="backup" class="view hidden">
+ <div class="panel"><h2>Backup / Restore</h2><p class="muted">Backup फाइलमध्ये तुमच्या नोंदी सेव्ह होतील. ती सुरक्षित ठेवा.</p>
+ <button class="primary" id="exportBtn">Backup फाइल डाउनलोड करा</button>
+ <label>जुना Backup परत आणा</label><input id="importFile" type="file" accept=".json,application/json">
+ <p class="muted">Restore केल्यावर सध्याच्या नोंदी बदलल्या जातील. आधी Backup घेणे योग्य.</p>
+ <button class="secondary danger" id="clearBtn">सर्व नोंदी हटवा</button>
+ </div>
+</section>
+<footer>My Daily Hishob • साधे वैयक्तिक हिशोब सॉफ्टवेअर</footer>
+</div>
+<script>
+const $=id=>document.getElementById(id);
+const today=()=>new Date().toLocaleDateString('en-CA');
+let entries=load(), selectedExpenseCategory='घरखर्च';
+let categories=[
+ {name:'घरखर्च',icon:'🏠'},{name:'किराणा',icon:'🛒'},{name:'दूध',icon:'🥛'},
+ {name:'भाजीपाला',icon:'🥦'},{name:'प्रवास / पेट्रोल',icon:'🛵'},{name:'मोबाईल रिचार्ज',icon:'📱'},
+ {name:'वीज बिल',icon:'💡'},{name:'भाडे',icon:'🏡'},{name:'EMI / कर्ज',icon:'🏦'},
+ {name:'औषधे',icon:'💊'},{name:'शिक्षण',icon:'📚'},{name:'इतर खर्च',icon:'🧾'}
+];
+function load(){try{return JSON.parse(localStorage.getItem('mdh_entries')||'[]')}catch(e){return []}}
+function save(){localStorage.setItem('mdh_entries',JSON.stringify(entries));render()}
+function money(n){return '₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
+function sum(list,type){return list.filter(x=>x.type===type).reduce((a,x)=>a+Number(x.amount),0)}
+function safe(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function switchTab(id){document.querySelectorAll('.view').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));render()}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
+function entryHTML(x){let isI=x.type==='income';return `<div class="entry"><div class="row"><div><div class="entry-title">${isI?'＋':'−'} ${safe(x.category)}</div><div class="entry-sub">${safe(x.date)}${x.note?' • '+safe(x.note):''}</div></div><div class="entry-amount ${isI?'green':'red'}">${isI?'+':'−'}${money(x.amount)}</div></div><div class="actions"><button class="secondary" onclick="editEntry('${x.id}')">Edit</button><button class="secondary danger" onclick="deleteEntry('${x.id}')">Delete</button></div></div>`}
+function listHTML(list,empty='अजून नोंदी नाहीत.'){return list.length?list.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.created||0)-(a.created||0)).map(entryHTML).join(''):`<p class="muted">${empty}</p>`}
+function render(){let inc=sum(entries,'income'),exp=sum(entries,'expense');$('totalIncome').textContent=money(inc);$('totalExpense').textContent=money(exp);$('balance').textContent=money(inc-exp);
+let t=entries.filter(x=>x.date===today());$('todayIncome').textContent=money(sum(t,'income'));$('todayExpense').textContent=money(sum(t,'expense'));
+$('recentList').innerHTML=listHTML(entries.slice().sort((a,b)=>(b.created||0)-(a.created||0)).slice(0,5));
+$('incomeList').innerHTML=listHTML(entries.filter(x=>x.type==='income'));$('expenseList').innerHTML=listHTML(entries.filter(x=>x.type==='expense'));
+renderCats();renderReport()}
+function renderCats(){let names=[...categories];entries.filter(x=>x.type==='expense').forEach(x=>{if(!names.some(c=>c.name===x.category))names.push({name:x.category,icon:'🧾'})});$('categoryGrid').innerHTML=names.map(c=>`<button type="button" class="cat ${selectedExpenseCategory===c.name?'selected':''}" onclick="selectCategory('${safe(c.name).replace(/'/g,"\\'")}')"><span class="icon">${safe(c.icon)}</span><span>${safe(c.name)}</span></button>`).join('')}
+function selectCategory(name){selectedExpenseCategory=name;renderCats()}
+function renderReport(){if(!$('reportMonth').value)$('reportMonth').value=today().slice(0,7);let month=$('reportMonth').value,type=$('reportType').value;let list=entries.filter(x=>x.date.startsWith(month)&&(type==='all'||x.type===type));$('reportIncome').textContent=money(sum(list,'income'));$('reportExpense').textContent=money(sum(list,'expense'));$('reportList').innerHTML=listHTML(list,'या कालावधीसाठी नोंदी नाहीत.')}
+$('reportMonth').addEventListener('change',renderReport);$('reportType').addEventListener('change',renderReport);
+$('incomeDate').value=today();$('expenseDate').value=today();$('reportMonth').value=today().slice(0,7);
+$('incomeForm').addEventListener('submit',e=>{e.preventDefault();let newCat=$('newIncomeCategory').value.trim(),cat=newCat||$('incomeCategory').value;if(newCat&&!Array.from($('incomeCategory').options).some(o=>o.value===newCat)){let o=document.createElement('option');o.value=o.textContent=newCat;$('incomeCategory').appendChild(o)}let id=$('incomeEditId').value;let obj={id:id||String(Date.now()),type:'income',category:cat,amount:Number($('incomeAmount').value),date:$('incomeDate').value,note:$('incomeNote').value.trim(),created:Date.now()};if(id){let i=entries.findIndex(x=>x.id===id);if(i>=0)entries[i]=obj}else entries.push(obj);e.target.reset();$('incomeDate').value=today();$('incomeEditId').value='';$('cancelIncomeEdit').classList.add('hidden');save();switchTab('income')});
+$('expenseForm').addEventListener('submit',e=>{e.preventDefault();let newName=$('newExpenseCategory').value.trim();if(newName){selectedExpenseCategory=newName;let icon=$('newExpenseIcon').value.trim()||'🧾';if(!categories.some(c=>c.name===newName))categories.push({name:newName,icon});else categories=categories.map(c=>c.name===newName?{name:newName,icon}:c)}let id=$('expenseEditId').value;let obj={id:id||String(Date.now()),type:'expense',category:selectedExpenseCategory,amount:Number($('expenseAmount').value),date:$('expenseDate').value,note:$('expenseNote').value.trim(),created:Date.now()};if(id){let i=entries.findIndex(x=>x.id===id);if(i>=0)entries[i]=obj}else entries.push(obj);e.target.reset();$('expenseDate').value=today();$('expenseEditId').value='';$('cancelExpenseEdit').classList.add('hidden');save();switchTab('expense')});
+window.editEntry=id=>{let x=entries.find(x=>x.id===id);if(!x)return;if(x.type==='income'){switchTab('income');$('incomeEditId').value=x.id;$('incomeCategory').value=x.category;if(!$('incomeCategory').value){let o=document.createElement('option');o.value=o.textContent=x.category;$('incomeCategory').appendChild(o);$('incomeCategory').value=x.category}$('incomeAmount').value=x.amount;$('incomeDate').value=x.date;$('incomeNote').value=x.note||'';$('cancelIncomeEdit').classList.remove('hidden')}else{switchTab('expense');selectedExpenseCategory=x.category;renderCats();$('expenseEditId').value=x.id;$('expenseAmount').value=x.amount;$('expenseDate').value=x.date;$('expenseNote').value=x.note||'';$('cancelExpenseEdit').classList.remove('hidden')}window.scrollTo({top:0,behavior:'smooth'})};
+window.deleteEntry=id=>{if(confirm('ही नोंद हटवायची आहे का?')){entries=entries.filter(x=>x.id!==id);save()}};
+$('cancelIncomeEdit').onclick=()=>{ $('incomeForm').reset();$('incomeDate').value=today();$('incomeEditId').value='';$('cancelIncomeEdit').classList.add('hidden')};
+$('cancelExpenseEdit').onclick=()=>{ $('expenseForm').reset();$('expenseDate').value=today();$('expenseEditId').value='';$('cancelExpenseEdit').classList.add('hidden');selectedExpenseCategory='घरखर्च';renderCats()};
+$('exportBtn').onclick=()=>{let blob=new Blob([JSON.stringify({app:'My Daily Hishob',version:1,entries,categories},null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='My-Daily-Hishob-Backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href)};
+$('importFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let d=JSON.parse(await f.text());if(!Array.isArray(d.entries))throw new Error();if(confirm('Restore केल्यावर सध्याच्या नोंदी बदलतील. पुढे जायचे?')){entries=d.entries; if(Array.isArray(d.categories))categories=d.categories;save();alert('Backup परत आणला आहे.')}}catch(err){alert('ही योग्य Backup फाइल नाही.')}e.target.value=''};
+$('clearBtn').onclick=()=>{if(confirm('सर्व नोंदी कायमच्या हटवायच्या? आधी Backup घेतला आहे का?')){entries=[];save()}};
+render();
+</script>
+</body>
+</html>
